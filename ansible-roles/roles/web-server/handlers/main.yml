@@ -1,0 +1,14 @@
+---
+# handlers file for web-server
+
+    - name: start nginx
+      ansible.builtin.service:
+         name: nginx
+         state: started
+         enabled: yes
+
+    - name: restarted nginx
+      ansible.builtin.service:
+         name: nginx
+         state: reloaded
+         enabled: yes

@@ -1,0 +1,44 @@
+
+    - name: copy_files 
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+          - /home/mou97/Ansible/html5up-editorial
+          - /home/mou97/Ansible/html5up-phantom
+      notify:
+        - restarted nginx
+
+
+    - name: run script for moving the web-files
+      ansible.builtin.script: web-files.sh
+
+    - name: run script for moving the web-files
+      ansible.builtin.script: nginx-debian-conf.sh
+      when: ansible_facts['os_family'] == "Debian"  
+      notify:
+        - restarted nginx
+
+    - name: run script for moving the web-files
+      ansible.builtin.script: nginx-redhat-conf.sh
+      when: ansible_facts['os_family'] == "RedHat"
+      notify:
+        - restarted nginx
+
+    - name: Set SELinux context for Nginx web on CentOS
+      block:
+        - name: Add SELinux context rule
+          ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "/var/www(/.*)?"
+          become: yes
+
+        - name: Apply SELinux context to /var/www
+          ansible.builtin.command: restorecon -Rv /var/www
+          become: yes
+
+          when: ansible_facts['os_family'] == "RedHat"
+          notify:
+            - restarted nginx
+

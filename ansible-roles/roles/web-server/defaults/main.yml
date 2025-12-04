@@ -1,0 +1,21 @@
+---
+# defaults file for web-server
+#
+#
+    install_packages_for_centos:
+      - nano
+      - htop
+      - wget
+      - httpd
+      - ufw  
+      - nginx  
+
+
+    install_packages_for_ubuntu:
+      - nano
+      - htop
+      - wget
+      - nodejs
+      - apache2
+      - nginx  
+

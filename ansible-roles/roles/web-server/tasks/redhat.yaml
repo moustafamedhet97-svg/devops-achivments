@@ -1,0 +1,7 @@
+    - name: Install packages
+      ansible.builtin.dnf:
+        name: "{{ install_packages_for_centos }}"
+        state: present
+      notify:
+        - start nginx
+

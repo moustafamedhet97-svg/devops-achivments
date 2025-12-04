@@ -1,0 +1,7 @@
+    - name: Install packages
+      ansible.builtin.apt:
+        name: "{{ install_packages_for_ubuntu }}"
+        state: present
+      notify:
+        - start nginx 
+
