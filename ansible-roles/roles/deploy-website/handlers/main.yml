@@ -1,0 +1,31 @@
+---
+# handlers file for my-role
+
+
+    - name: start nginx 
+      ansible.builtin.service:
+         name: nginx
+         state: started 
+         enabled: yes
+
+    - name: restarted nginx
+      ansible.builtin.service:
+         name: nginx
+         state: reloaded
+         enabled: yes
+
+
+
+    - name: start httpd
+      ansible.builtin.service:
+         name: httpd
+         state: started
+         enabled: yes
+
+    - name: restarted httpd
+      ansible.builtin.service:
+         name: httpd
+         state: reloaded
+         enabled: yes
+
+

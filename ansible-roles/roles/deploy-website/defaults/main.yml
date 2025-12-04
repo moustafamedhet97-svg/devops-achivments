@@ -1,0 +1,16 @@
+---
+# defaults file for my-role
+    install_packages_for_centos:
+      - nano
+      - htop
+      - wget
+      - httpd  
+
+
+    install_packages_for_ubuntu:
+      - nano
+      - htop
+      - wget
+      - nodejs
+      - nginx 
+      - ufw 
