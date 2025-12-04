@@ -1,0 +1,126 @@
+- name: manage_packages
+  hosts: servers
+  become: true
+
+  vars:
+    install_packages_for_centos:
+      - nano
+      - htop
+      - wget
+      - httpd
+      - ufw  
+      - nginx  
+
+
+    install_packages_for_ubuntu:
+      - nano
+      - htop
+      - wget
+      - nodejs
+      - apache2
+      - nginx  
+
+
+  tasks:
+
+
+ # install packages    
+ #######################################################
+ 
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name: "{{ install_packages_for_ubuntu }}"
+        state: present
+      when: ansible_facts['os_family'] == "Debian"
+      register: apt_update_result  
+      notify:
+        - start nginx 
+
+    - name: Install packages
+      ansible.builtin.dnf:
+        name: "{{ install_packages_for_centos }}"
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+      notify:
+        - start httpd
+
+
+# copy file configuration
+ #######################################################
+
+    - name: copy_files ubuntu
+      ansible.builtin.copy:
+        src: /home/mou97/Ansible/html5up-phantom
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: 0777
+      notify:
+        - restarted nginx
+      when: ansible_facts['os_family'] == "Debian"    
+
+    - name: copy_files centos
+      ansible.builtin.copy:
+        src: /home/mou97/Ansible/html5up-phantom
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: 0777
+      notify:
+        - restarted httpd
+      when: ansible_facts['os_family'] == "RedHat"    
+
+
+    - name: Debug and print output
+      ansible.builtin.debug:
+       var : ansible_facts['os_family']
+
+    - name: run script for moving the website
+      ansible.builtin.script: website_handle.sh
+
+    - name: Fix ownership after script moves files
+      ansible.builtin.file:
+        path: /var/www/html
+        owner: apache
+        group: apache
+        mode: 0777  
+        recurse: yes
+      when: ansible_facts['os_family'] == "RedHat"
+      notify: restarted httpd
+
+
+    - name: Fix SELinux context for Apache
+      ansible.builtin.command: chcon -R --type=httpd_sys_content_t /var/www/html
+      when: ansible_facts['os_family'] == "RedHat"
+      notify: restarted httpd
+
+        
+
+  handlers:
+    - name: start nginx 
+      ansible.builtin.service:
+         name: nginx
+         state: started 
+         enabled: yes
+
+    - name: restarted nginx
+      ansible.builtin.service:
+         name: nginx
+         state: reloaded
+         enabled: yes
+
+
+
+    - name: start httpd
+      ansible.builtin.service:
+         name: httpd
+         state: started
+         enabled: yes
+
+    - name: restarted httpd
+      ansible.builtin.service:
+         name: httpd
+         state: reloaded
+         enabled: yes
+
