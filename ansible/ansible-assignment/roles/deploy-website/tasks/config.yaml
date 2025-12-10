@@ -1,0 +1,44 @@
+    - name: copy_files ubuntu
+      ansible.builtin.copy:
+        src: /home/mou97/Ansible/html5up-phantom
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: 0777
+      notify:
+        - restarted nginx
+      when: ansible_facts['os_family'] == "Debian"    
+
+    - name: copy_files centos
+      ansible.builtin.copy:
+        src: /home/mou97/Ansible/html5up-phantom
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: 0777
+      notify:
+        - restarted httpd
+      when: ansible_facts['os_family'] == "RedHat"    
+
+
+    - name: Debug and print output
+      ansible.builtin.debug:
+       var : ansible_facts['os_family']
+
+    - name: run script for moving the website
+      ansible.builtin.script: website_handler.sh
+
+    - name: Fix ownership after script moves files
+      ansible.builtin.file:
+        path: /var/www/html
+        owner: apache
+        group: apache
+        mode: 0777  
+        recurse: yes
+      when: ansible_facts['os_family'] == "RedHat"
+      notify: restarted httpd
+
+    - name: Fix SELinux context for Apache
+      ansible.builtin.command: chcon -R --type=httpd_sys_content_t /var/www/html
+      when: ansible_facts['os_family'] == "RedHat"
+      notify: restarted httpd

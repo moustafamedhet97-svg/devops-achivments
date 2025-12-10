@@ -1,0 +1,7 @@
+- name: static-web-server
+  hosts: servers
+  become: true
+
+  roles:
+    - web-server
+

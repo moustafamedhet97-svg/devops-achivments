@@ -1,0 +1,10 @@
+---
+# vars file for web-server
+
+    install_packages_for_centos:
+      - nginx
+
+
+    install_packages_for_ubuntu:
+      - nginx
+

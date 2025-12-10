@@ -1,0 +1,8 @@
+- name: manage_packages
+  hosts: servers
+  become: true
+
+  roles:
+    - deploy-website
+      # - geerlingguy.redis
+      #- chadek.nodejs

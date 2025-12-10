@@ -1,0 +1,9 @@
+    - name: Install packages
+      ansible.builtin.apt:
+        name: "{{ install_packages_for_ubuntu }}"
+        state: present
+      when: ansible_facts['os_family'] == "Debian"
+      register: apt_update_result  
+      notify:
+        - start nginx 
+
